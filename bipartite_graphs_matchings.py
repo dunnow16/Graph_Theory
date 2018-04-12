@@ -190,21 +190,21 @@ def partite_sets(graph):
 Boolean Bipartite Check method:
 
 This method checks is a graph is bipartite. 
-:param graph:
-:return: Boolean
+:param graph: a graph that may or may not be bipartite
+:return: Boolean: True if the graph is bipartite
 """
 
 
 def is_bipartite(graph):
-    set1 = []  # vertex set 1
-    set2 = []  # vertex set 2
+    # set1 = []  # vertex set 1
+    # set2 = []  # vertex set 2
     vertices = list(graph.keys())
+    q = copy.deepcopy(vertices)  # queue of all vertices
     colors = {vertices[0]: 0}  # 0 or 1 used (2 colors)
 
     if len(graph) <= 1:
         return True
-    set1.append(vertices[0])
-    v = set1[0]
+    # set1.append(vertices[0])
     # Using coloring logic, with color 1 within set 1 and color 2 within
     # set 2, first add the first key/vertex to set 1. Then add all of
     # the neighbors of the vertex to set 2. Then iteratively go to the
@@ -213,17 +213,47 @@ def is_bipartite(graph):
     # having two bipartite sets, then the graph is not bipartite.
     # Go until all vertices have been colored or it is found a bipartite
     # graph is not possible.
-    while len(colors) != len(graph):
-        neighbors = graph[v]
-        for n in neighbors:  # Color all neighbors the other color.
-            if n not in colors:
-                if colors[v] == 0:
-                    colors[n] = 1  # adds new key to dictionary
-                elif colors[v] == 1:
-                    colors[n] = 0
-            else:
-                if colors[v] == colors[n]:
-                    return False
+    # Initialize vertex to check neighbors and index.
+    i = 0
+    v = vertices[0]  # color already initialized to 0
+    #for v in vertices:
+    #while len(colors) != len(graph):
+    while not len(q) == 0:
+        neighbors = graph[v]  # neighbors of vertex v
+        if v in colors and v in q:
+            for n in neighbors:  # Color all neighbors the other color.
+                if n not in colors:
+                    if colors[v] == 0:
+                        colors[n] = 1  # adds new key to dictionary
+                    elif colors[v] == 1:
+                        colors[n] = 0
+                else:
+                    # Does a neighbor have same color?
+                    if colors[v] == colors[n]:
+                        print(colors)
+                        return False
+            q.remove(v)
+
+        # Loop and repeat over all the vertices as needed.
+        i = (i + 1) % len(vertices)
+        v = vertices[i]
+        print(q)
+
+    print(colors)
+    return True
+
+
+"""
+Boolean Perfect Matching method: 
+
+This method determines if a bipartite graph (assumed) has a perfect
+matching. True is returned if the graph has a perfect matching.
+:param graph: a bipartite graph (assumed to be)
+:return: Boolean: True if has a perfect matching
+"""
+
+
+def is_perfect(graph):
 
 
     return True
@@ -253,7 +283,10 @@ if __name__ == "__main__":
                         "C": ["A", "D"], "D": ["B", "C"]}))
     print()
 
-    print('test is_bipartite()')
+    print('test is_bipartite(graph)')
     print(is_bipartite({"A": ["B", "C"], "B": ["A"], "C": ["A"]}))
     print(is_bipartite({"A": ["B", "C"], "B": ["A", "C"],
                         "C": ["A", "B"]}))
+    print()
+
+    print('test is_perfect(graph)')
