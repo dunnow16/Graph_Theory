@@ -18,6 +18,7 @@ print("Project 1: Bipartite Graphs and Matchings")
     in progress is checked if it already contains the element. If an 
     element is already in the set, the next element of the list is 
     considered until every list element has been checked.
+    The set is actually a list data type in Python.
     
     :param _list: a list
     :return: a set
@@ -180,7 +181,7 @@ def partite_sets(graph):
                     break
 
     # Return two lists or append to one list?
-    return set1, set2
+    return set1, set2  # returns tuples (can't be changed)
     # sets.append(set1)
     # sets.append(set2)
     #return sets
@@ -230,16 +231,16 @@ def is_bipartite(graph):
                 else:
                     # Does a neighbor have same color?
                     if colors[v] == colors[n]:
-                        print(colors)
+                        #print(colors)
                         return False
             q.remove(v)
 
         # Loop and repeat over all the vertices as needed.
         i = (i + 1) % len(vertices)
         v = vertices[i]
-        print(q)
+        #print(q)
 
-    print(colors)
+    #print(colors)
     return True
 
 
@@ -248,13 +249,35 @@ Boolean Perfect Matching method:
 
 This method determines if a bipartite graph (assumed) has a perfect
 matching. True is returned if the graph has a perfect matching.
+Hall's Theorem is used:
 :param graph: a bipartite graph (assumed to be)
 :return: Boolean: True if has a perfect matching
 """
 
 
 def is_perfect(graph):
+    # Get the partite sets of the bipartite graph.
+    X, Y = partite_sets(graph)
 
+    # Check the size of the neighborhood for each subset of each partite
+    # set. The size of the union of neighborhoods should be less than or
+    # equal to the size of the subset for each subset.
+    # Find all subsets (power set) of each partite set.
+    A = power(X)
+    B = power(Y)
+    print(X)
+    print(A)
+    print(Y)
+    print(B)
+
+    n = []  # neighborhood of a subset
+    
+    for s in A:  # for all subsets of partite set A
+        for v in s:  # for all vertices in the subset
+
+    n = []
+
+    for s in B:  # for all subsets of partite set B
 
     return True
 
@@ -281,12 +304,27 @@ if __name__ == "__main__":
     print(partite_sets({"A": ["B", "C"], "B": ["A"], "C": ["A"]}))
     print(partite_sets({"A": ["B", "C"], "B": ["A", "D"],
                         "C": ["A", "D"], "D": ["B", "C"]}))
+    print(partite_sets({'A': ['B', 'F'], 'B': ['A', 'C'],
+                        'C': ['B', 'D'], 'D': ['C', 'E'],
+                        'E': ['D', 'F'], 'F': ['A', 'E']}))
     print()
 
     print('test is_bipartite(graph)')
-    print(is_bipartite({"A": ["B", "C"], "B": ["A"], "C": ["A"]}))
+    print(is_bipartite({"A": ["B", "C"], "B": ["A"], "C": ["A"]}))  # T
     print(is_bipartite({"A": ["B", "C"], "B": ["A", "C"],
-                        "C": ["A", "B"]}))
+                        "C": ["A", "B"]}))  # F
+    print(is_bipartite({"A": ["B", "C"], "B": ["A", "D"],
+                        "C": ["A", "D"], "D": ["B", "C"]}))  # T
+    print(is_bipartite({'A': ['B', 'F'], 'B': ['A', 'C'],
+                        'C': ['B', 'D'], 'D': ['C', 'E'],
+                        'E': ['D', 'F'], 'F': ['A', 'E']}))  # T
     print()
 
     print('test is_perfect(graph)')
+    print(is_perfect({'A': ['B', 'C'], 'B': ['A', 'D'],
+                      'C': ['A', 'D'], 'D': ['B', 'C']}))  # T
+    print(is_perfect({'A': ['B', 'C'], 'B': ['A'], 'C': ['A']}))  # F
+    print(is_perfect({'A': ['B', 'F'], 'B': ['A', 'C'],
+                      'C': ['B', 'D'], 'D': ['C', 'E'],
+                      'E': ['D', 'F'], 'F': ['A', 'E']}))  # T
+    print()
