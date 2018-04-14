@@ -1,7 +1,8 @@
 """
 
 """
-def color_three():
+def color_three(graph):
+    
     
     
     
