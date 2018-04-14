@@ -2,7 +2,7 @@ import copy
 
 """
     Owen Dunn, MTH 325, 4/19/18, Project: 
-    
+
     This project implements a number of functions related to .
 """
 
@@ -19,7 +19,7 @@ print("Project 1: Bipartite Graphs and Matchings")
     element is already in the set, the next element of the list is 
     considered until every list element has been checked.
     The set is actually a list data type in Python.
-    
+
     :param _list: a list
     :return: a set
 """
@@ -74,7 +74,7 @@ def make_set(_list):
 
     Several sources used, such as: 6/15/17
     http://www.geeksforgeeks.org/finding-all-subsets-of-a-given-set-in-java/
-    
+
     :param _list: a list 
     :return: a power set of the list parameter
 '''
@@ -89,7 +89,7 @@ def power(_list):
     set_size = len(_set)  # used for binary solution
 
     # Using binary logic, each element is represented by a 1 or 0 if it
-    # is in a subset of the powerset. Ex: 111 for {a, b, c} is subset
+    # is in a subset of the power set. Ex: 111 for {a, b, c} is subset
     # {a, b, c}
     # There are thus 2^n or 2 ** n (python code) or 1 << setSize total
     # subsets in the power set.
@@ -116,9 +116,6 @@ def power(_list):
 
     # Sort the power set to be in the familiar logical order as if done
     # by a human.
-    # line from: 6/15/17
-    # https://stackoverflow.com/questions/4735704/ordering-a-list-of-lists-by-lists-len
-    # sorts by sum of whole list if same size
     power_set = sorted(power_set, key=len)
 
     return power_set
@@ -126,7 +123,7 @@ def power(_list):
 
 """
     Partite Sets method: 
-    
+
     This method returns the partite sets of a bipartite graph.
     :param graph: a bipartite graph (dictionary type)
     :return: the two partite sets of the graph (as lists)
@@ -140,6 +137,7 @@ def partite_sets(graph):
     # A list of two sets: one for each partite set.
     sets = []
     vertices = list(graph.keys())
+    q = copy.deepcopy(vertices)  # queue of vertices
 
     if len(graph) == 0:  # check for empty graph
         return []
@@ -147,7 +145,8 @@ def partite_sets(graph):
         return []
 
     # Add the first vertex to the first set.
-    set1.append(vertices[0])
+    #set1.append(vertices[0])
+    #q.remove(vertices[0])
     # Check which partite set all remaining vertices belong to.
     # Using the assumption that the graph is bipartite:
     # This is done by checking if a vertex is adjacent to any vertices
@@ -168,23 +167,45 @@ def partite_sets(graph):
     # Adjacent vertices can not be in the same partite set or else both
     # endpoints of an edge would be in the same partite set, which is
     # against definition of a bipartite graph.
-    for v in vertices:
+    # for v in vertices:  # works, but not for all cases (paths mostly)
+    #     neighbors = graph[v]
+    #     for n in neighbors:
+    #         if v not in set1:
+    #             if n in set1:
+    #                 set2.append(v)
+    #                 break
+    #         if v not in set2:
+    #             if n in set2:
+    #                 set1.append(v)
+    #                 break
+
+    i = 0  # index of vertices
+    v = vertices[0]
+    set1.append(v)
+    q.remove(v)
+    while len(q) > 0:  # Run until finding a place for all vertices.
         neighbors = graph[v]
-        for n in neighbors:
-            if v not in set1:
+        # Don't waste time if already found partite set for vertex.
+        if v in q:
+            #if v not in set1 and v not in set2:  # q handles this?
+            for n in neighbors:
                 if n in set1:
                     set2.append(v)
+                    q.remove(v)
                     break
-            if v not in set2:
-                if n in set2:
+                elif n in set2:
                     set1.append(v)
+                    q.remove(v)
                     break
+
+        i = (i + 1) % len(vertices)
+        v = vertices[i]
 
     # Return two lists or append to one list?
     return set1, set2  # returns tuples (can't be changed)
     # sets.append(set1)
     # sets.append(set2)
-    #return sets
+    # return sets
 
 
 """
@@ -217,9 +238,9 @@ def is_bipartite(graph):
     # Initialize vertex to check neighbors and index.
     i = 0
     v = vertices[0]  # color already initialized to 0
-    #for v in vertices:
-    #while len(colors) != len(graph):
-    while not len(q) == 0:
+    # for v in vertices:
+    # while len(colors) != len(graph):
+    while len(q) > 0:
         neighbors = graph[v]  # neighbors of vertex v
         if v in colors and v in q:
             for n in neighbors:  # Color all neighbors the other color.
@@ -231,16 +252,16 @@ def is_bipartite(graph):
                 else:
                     # Does a neighbor have same color?
                     if colors[v] == colors[n]:
-                        #print(colors)
+                        # print(colors)
                         return False
             q.remove(v)
 
         # Loop and repeat over all the vertices as needed.
         i = (i + 1) % len(vertices)
         v = vertices[i]
-        #print(q)
+        # print(q)
 
-    #print(colors)
+    # print(colors)
     return True
 
 
@@ -270,15 +291,31 @@ def is_perfect(graph):
     print(Y)
     print(B)
 
-    n = []  # neighborhood of a subset
-    
-    for s in A:  # for all subsets of partite set A
+    n = []  # union of neighborhoods of a subset
+    for s in A:  # for all subsets of partite set X
         for v in s:  # for all vertices in the subset
+            tmp = graph[v]  # neighbors of vertex v
+            for t in tmp:
+                if t not in n:
+                    n.append(t)
+        # if size of union of neighborhoods is less than size of subset
+        if len(n) < len(s):
+            return False
+        n = []  # reset the union of neighborhoods
 
-    n = []
+    for s in B:  # for all subsets of partite set Y
+        for v in s:  # for all vertices in the subset
+            tmp = graph[v]  # neighbors of vertex v
+            for t in tmp:
+                if t not in n:
+                    n.append(t)
+        # if size of union of neighborhoods is less than size of subset
+        if len(n) < len(s):
+            return False
+        n = []  # reset the union of neighborhoods
 
-    for s in B:  # for all subsets of partite set B
-
+    # Size of union of neighborhoods for all subsets of partite sets
+    # found to be at least as large as the subset itself.
     return True
 
 
@@ -286,12 +323,10 @@ def is_perfect(graph):
 Test all the functions from the project.
 """
 
-
 if __name__ == "__main__":
-
     """
-    Test all the functions from the project.
-    """
+  Test all the functions from the project.
+  """
     print('test power(list)')
     print(power([1, 3, 5]))
     print(power([1, 1, 1]))
@@ -327,4 +362,7 @@ if __name__ == "__main__":
     print(is_perfect({'A': ['B', 'F'], 'B': ['A', 'C'],
                       'C': ['B', 'D'], 'D': ['C', 'E'],
                       'E': ['D', 'F'], 'F': ['A', 'E']}))  # T
+    print(is_perfect({'A': ['E', 'F'], 'B': ['D', 'E'], 'C': ['D', 'F'],
+                      'D': ['B', 'C'], 'E': ['A', 'B'],
+                      'F': ['A', 'C']}))  # T
     print()
