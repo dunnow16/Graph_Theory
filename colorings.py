@@ -10,7 +10,13 @@ print("Owen Dunn, MTH 325, 4/19/18")
 print("Project 2: Colorings")
 
 """
+Is Proper:
 
+This method determines whether or not the labeling is a proper vertex
+coloring of the given graph.
+:param graph: a graph
+:param color: a corresponding vertex coloring of the graph
+:return: Return True is found to be a proper vertex coloring
 """
 
 
@@ -55,16 +61,15 @@ def three_color(graph):
     # colorings. Then add one to each value in the number to get the
     # colors for each vertex.
     for n in range(num_unique):
-        nums = []  # list of remainders
-        num = n    # number used to calculate ternary number
+        nums = list()  # list of remainders
+        num = n        # number used to calculate ternary number
         if n == 0:
             nums.append(0)
         while num > 0:
             # divide by 3 and save result and remainder
-            #n, r = divmod(n, 3)  # built-in method
             r = num % 3
-            num = int(num / 3)
-            nums.append(r)  # save all remainders
+            num = int(num / 3)  # truncate to integer
+            nums.append(r)      # save all remainders
         # The reverse of the remainders is the ternary number.
         start = 0
         end = len(nums) - 1
@@ -78,20 +83,20 @@ def three_color(graph):
         while len(nums) < num_v:
             nums.insert(0, 0)  # pad zeroes
         #print(nums)
-        # Add one to each color.
+        # Add one to each color (starts at 1, not 0).
         for i in range(len(nums)):
             nums[i] += 1
-        print(nums)
+        #print(nums)
         # Assign each value of the found number to the corresponding
-        # vertex.
+        # vertex for color assignment.
         tmp = dict()
         for i in range(num_v):
             v = vertices[i]  # vertex key
             value = nums[i]  # mapped vertex value for color
             tmp[v] = value   # add key/value pair
-        dicts.append(tmp)  # add tmp dictionary to all dictionaries
-        print(n)
-        print(dicts[n])
+        dicts.append(tmp)    # add tmp dictionary to dictionaries list
+        #print(n)
+        #print(dicts[n])
 
     # for n in range(len(dicts)):
     #     print(dicts[n])
@@ -111,10 +116,24 @@ at most three.
 
 
 def is_three_color(graph):
+    # a list of all possible color dictionaries
+    dicts = three_color(graph)
 
-
+    for d in dicts:
+        if is_proper(graph, d):
+            return True
 
     return False
+
+
+"""
+Is Proper Edge:
+
+
+"""
+def is_proper_edge(graph):
+    
+
 
 if __name__ == "__main__":
     """
@@ -130,4 +149,13 @@ if __name__ == "__main__":
     print()
     print('test three_color(graph)')
     print(three_color({'A': ['B'], 'B': ['A']}))
-
+    print()
+    print('test is_three_color(graph)')
+    print(is_three_color({'A': ['B', 'C'], 'B': ['A', 'C'],
+                          'C': ['A', 'B']}))  # T
+    print(is_three_color({'A': ['B', 'C', 'D'], 'B': ['A', 'C', 'D'],
+                          'C': ['A', 'B', 'D'], 'D': ['A', 'B', 'C']}))
+    # F
+    print()
+    print('test is_proper_edge(graph)')
+    print(is_proper_edge(graph))
