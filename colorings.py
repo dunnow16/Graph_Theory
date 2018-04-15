@@ -129,10 +129,40 @@ def is_three_color(graph):
 """
 Is Proper Edge:
 
-
+This method determines if the edge labeling of a graph is a proper
+edge-coloring.
+:param graph: a weighted graph (has all edges labeled) 
+:return: True if the graph is a proper edge-coloring 
 """
+
+
 def is_proper_edge(graph):
-    
+    vertices = list(graph.keys())  # all graph vertices
+    colors = list(graph.values())  # all edge colorings
+    edge = list()  # an edge of two vertices
+    print(vertices)
+    print(colors)
+
+    for i in range(len(vertices)):  # Go for each vertex.
+        v = vertices[i]
+        edges = colors[i]  # edges of vertex v
+        for j in range(len(edges)):  # Go for each edge
+            tmp = edges[j]      # one of the edges
+            v_adj = tmp[0]  # adjacent vertex to v
+            edge = [v, v_adj]  # vertex pair of the edge
+            color_v = tmp[1]    # color value of edge
+            # Check the graph for the adjacent vertex's edges.
+            edges_adj = graph[v_adj]
+            # Check if any edges of the adjacent vertex have the same
+            # color.
+            for k in range(len(edges_adj)):
+                tmp = edges_adj[k]
+                if tmp[0] != v:  # if not the same edge
+                    # If two incident edges have the same color.
+                    if color_v == tmp[1]:
+                        return False
+
+    return True
 
 
 if __name__ == "__main__":
@@ -158,4 +188,10 @@ if __name__ == "__main__":
     # F
     print()
     print('test is_proper_edge(graph)')
-    print(is_proper_edge(graph))
+    print(is_proper_edge({'A': [['B', 1], ['C', 2]],
+                          'B': [['A', 1], ['C', 3]],
+                          'C': [['A', 2], ['B', 3]]}))  # T
+    print(is_proper_edge({'A': [['B', 1], ['C', 2]],
+                          'B': [['A', 1], ['C', 2]],
+                          'C': [['A', 2], ['B', 2]]}))  # F
+    print()
