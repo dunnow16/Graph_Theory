@@ -1,9 +1,9 @@
 import copy
 
 """
-    Owen Dunn, MTH 325, 4/19/18, Project: 
+    Owen Dunn, MTH 325, 4/19/18, Project 2: Colorings
 
-    This project implements a number of functions related to .
+    This project implements a number of functions related to coloring.
 """
 
 print("Owen Dunn, MTH 325, 4/19/18")
@@ -139,18 +139,17 @@ edge-coloring.
 def is_proper_edge(graph):
     vertices = list(graph.keys())  # all graph vertices
     colors = list(graph.values())  # all edge colorings
-    edge = list()  # an edge of two vertices
     print(vertices)
     print(colors)
 
     for i in range(len(vertices)):  # Go for each vertex.
-        v = vertices[i]
+        v = vertices[i]    # a vertex to consider its edges
         edges = colors[i]  # edges of vertex v
         for j in range(len(edges)):  # Go for each edge
-            tmp = edges[j]      # one of the edges
-            v_adj = tmp[0]  # adjacent vertex to v
-            edge = [v, v_adj]  # vertex pair of the edge
-            color_v = tmp[1]    # color value of edge
+            tmp = edges[j]     # one of the edges
+            v_adj = tmp[0]     # adjacent vertex to v
+            #edge = [v, v_adj]  # vertex pair of the edge (not needed?)
+            color_v = tmp[1]   # color value of edge
             # Check the graph for the adjacent vertex's edges.
             edges_adj = graph[v_adj]
             # Check if any edges of the adjacent vertex have the same
@@ -163,6 +162,59 @@ def is_proper_edge(graph):
                         return False
 
     return True
+
+
+"""
+Greedy:
+
+This method takes a graph and an ordering of vertices (of the graph) and
+returns the proper vertex coloring produced by the greedy algorithm.
+:param graph: a graph
+:param order: an ordering of vertices of the graph
+:return: a proper vertex coloring
+"""
+
+
+def greedy(graph, order):
+    color = dict()  # the coloring dictionary for all vertices
+
+    if len(order) == 1:
+        return {order[0]: 1}
+    if len(order) == 0:
+        print('You must provide an ordering of vertices.')
+        return {}
+    if len(graph) == 0:
+        print('You must provide a graph.')
+        return {}
+    if set(graph.keys()) - set(order) != set():
+        print('You must provide an ordering of all vertices.')
+        return {}
+
+    # Assign colors to each vertex in the order in sequence.
+    # First assign the first vertex of the order color 1.
+    color[order[0]] = 1
+    # Assign colors to the rest of the vertices.
+    for v in order[1:]:
+        neighbors = graph[v]
+        # Check color for all neighbors of vertex v.
+        n_colors = list()  # list of neighbor colors
+        for n in neighbors:
+            if n in color:
+                n_colors.append(color[n])
+        if len(n_colors) == 0:  # if no neighbors have a color assigned
+            color[v] = 1
+        else:
+            colored = False  # True when color assigned for given vertex
+            # color to assign to vertex v if not given to a neighbor
+            c = 1
+            while not colored:
+                if c not in n_colors:
+                    color[v] = c
+                    colored = True
+                c = c + 1
+
+    # Return the completed proper vertex coloring sorted by letter.
+    return dict(sorted(color.items()))
 
 
 if __name__ == "__main__":
@@ -195,3 +247,8 @@ if __name__ == "__main__":
                           'B': [['A', 1], ['C', 2]],
                           'C': [['A', 2], ['B', 2]]}))  # F
     print()
+    print('test greedy(graph, order)')
+    print(greedy({'A': ['B', 'C'], 'B': ['A'], 'C': ['A']},
+                 ['A', 'B', 'C']))
+    print(greedy({'A': ['B'], 'B': ['A', 'C'], 'C': ['B', 'D'],
+                  'D': ['C']}, ['A', 'D', 'B', 'C']))
