@@ -239,7 +239,7 @@ Hall's Theorem is used.
 """
 
 
-def is_perfect(graph):
+def is_perfect(graph={}):
     # Get the partite sets of the bipartite graph.
     X, Y = partite_sets(graph)
 
@@ -255,6 +255,10 @@ def is_perfect(graph):
     # print(A)
     # print(Y)
     # print(B)
+
+    if len(graph) == 0:
+        print('You must provide a graph.')
+        return False
 
     n = []                  # union of neighborhoods of a subset
     for s in A:             # for all subsets of partite set X
