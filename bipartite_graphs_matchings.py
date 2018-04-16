@@ -1,9 +1,11 @@
 import copy
 
 """
-    Owen Dunn, MTH 325, 4/19/18, Project: 
+    Owen Dunn, MTH 325, 4/19/18, Project 1: Bipartite Graphs and 
+    Matchings 
 
-    This project implements a number of functions related to .
+    This project implements a number of functions related to bipartite
+    graphs.
 """
 
 print("Owen Dunn, MTH 325, 4/19/18")
@@ -25,7 +27,7 @@ print("Project 1: Bipartite Graphs and Matchings")
 """
 
 
-def make_set(_list):
+def make_set(_list=[]):
     # I used underscores "_" before list and set variables to not
     # confuse/shadow with Python keywords.
     # first check if passed list any elements
@@ -53,7 +55,7 @@ def make_set(_list):
     This function produces a power set from a list. First, the list is
     converted into a set. This set is then used to make its power set, 
     which contains all the subsets of the set. To find the power set, a 
-    binary method  is used. The size of a set determines how many 
+    binary method is used. The size of a set determines how many 
     possible subsets it can have.
 
     For example, a set of 3 such as {1,3,5} has 2^3 = 8 possible 
@@ -80,7 +82,7 @@ def make_set(_list):
 '''
 
 
-def power(_list):
+def power(_list=[]):
     power_set = []  # always contains at least the null set
 
     # produce the set to use to produce the power set
@@ -91,14 +93,13 @@ def power(_list):
     # Using binary logic, each element is represented by a 1 or 0 if it
     # is in a subset of the power set. Ex: 111 for {a, b, c} is subset
     # {a, b, c}
-    # There are thus 2^n or 2 ** n (python code) or 1 << setSize total
+    # There are thus 2^n or 2 ** n (python code) or (1 << setSize) total
     # subsets in the power set.
     # A left bit shift doubles the possibilities each time.
     for i in range(1 << set_size):
-        if i == 0:
+        if i == 0:  # add the null set
             tmp = []
             power_set.append(tmp)
-            continue  # go to next i value or subset
         else:
             tmp = []
             j = 1  # used to check if a bit is 1 for all bits
@@ -130,36 +131,17 @@ def power(_list):
 """
 
 
-def partite_sets(graph):
+def partite_sets(graph={}):
     # The partite sets are initialized.
-    set1 = []
-    set2 = []
-    # A list of two sets: one for each partite set.
-    sets = []
+    set1 = list()
+    set2 = list()
     vertices = list(graph.keys())
     q = copy.deepcopy(vertices)  # queue of vertices
 
     if len(graph) == 0:  # check for empty graph
-        return []
+        return list(), list()
     if len(graph) == 1:
-        return []
-
-    # Add the first vertex to the first set.
-    #set1.append(vertices[0])
-    #q.remove(vertices[0])
-    # Check which partite set all remaining vertices belong to.
-    # Using the assumption that the graph is bipartite:
-    # This is done by checking if a vertex is adjacent to any vertices
-    # in the first set. If the vertex is adjacent to a vertex in the
-    # first set, it is appended to the second set. Adjacent vertices in
-    # a bipartite graph cannot be part of the same partite set.
-    # for v in vertices[1:]:  # second through last vertex
-    #     for i in range(len(vertices)):
-    #         if v in graph.get(vertices[i], []):
-    #             set2.append(v)
-    #             break  # check next vertex
-    #     else:  # runs if break not reached in for loop
-    #         set1.append(v)
+        return list(graph.keys()), list()
 
     # For all the vertices, check if any of its neighbors or adjacent
     # vertices are in one of the two sets. If one neightbors of the
@@ -167,27 +149,14 @@ def partite_sets(graph):
     # Adjacent vertices can not be in the same partite set or else both
     # endpoints of an edge would be in the same partite set, which is
     # against definition of a bipartite graph.
-    # for v in vertices:  # works, but not for all cases (paths mostly)
-    #     neighbors = graph[v]
-    #     for n in neighbors:
-    #         if v not in set1:
-    #             if n in set1:
-    #                 set2.append(v)
-    #                 break
-    #         if v not in set2:
-    #             if n in set2:
-    #                 set1.append(v)
-    #                 break
-
-    i = 0  # index of vertices
-    v = vertices[0]
-    set1.append(v)
-    q.remove(v)
-    while len(q) > 0:  # Run until finding a place for all vertices.
-        neighbors = graph[v]
+    i = 0            # initial index of vertices
+    v = vertices[0]  # the initial vertex
+    set1.append(v)   # add the first vertex to the first partite set
+    q.remove(v)      # remove the first vertex from the queue
+    while len(q) > 0:  # Run until found a place for all vertices.
+        neighbors = graph[v]  # adjacent vertices of vertex v
         # Don't waste time if already found partite set for vertex.
-        if v in q:
-            #if v not in set1 and v not in set2:  # q handles this?
+        if v in q:  # if vertex is in the queue
             for n in neighbors:
                 if n in set1:
                     set2.append(v)
@@ -198,49 +167,41 @@ def partite_sets(graph):
                     q.remove(v)
                     break
 
+        # cycle and re-try vertices as needed
         i = (i + 1) % len(vertices)
         v = vertices[i]
 
-    # Return two lists or append to one list?
     return set1, set2  # returns tuples (can't be changed)
-    # sets.append(set1)
-    # sets.append(set2)
-    # return sets
 
 
 """
 Boolean Bipartite Check method:
 
-This method checks is a graph is bipartite. 
+This method checks if a graph is bipartite. 
 :param graph: a graph that may or may not be bipartite
-:return: Boolean: True if the graph is bipartite
+:return: True if the graph is bipartite
 """
 
 
-def is_bipartite(graph):
-    # set1 = []  # vertex set 1
-    # set2 = []  # vertex set 2
-    vertices = list(graph.keys())
-    q = copy.deepcopy(vertices)  # queue of all vertices
-    colors = {vertices[0]: 0}  # 0 or 1 used (2 colors)
+def is_bipartite(graph={}):
+    vertices = list(graph.keys())  # vertices of the graph
+    q = copy.deepcopy(vertices)    # queue of all vertices
+    colors = {vertices[0]: 0}      # 0 or 1 used (2 colors)
 
     if len(graph) <= 1:
         return True
-    # set1.append(vertices[0])
-    # Using coloring logic, with color 1 within set 1 and color 2 within
-    # set 2, first add the first key/vertex to set 1. Then add all of
-    # the neighbors of the vertex to set 2. Then iteratively go to the
-    # neighbors and put all of the neighbors in the other set. If it is
-    # found that this can't be done while maintaining only two colors or
-    # having two bipartite sets, then the graph is not bipartite.
-    # Go until all vertices have been colored or it is found a bipartite
-    # graph is not possible.
+
+    # Using coloring logic, assign colors to vertices. First assign
+    # color 1 to the initial vertex. Then iteratively go to the
+    # neighbors and give them all the other color if they have not been
+    # assigned a color. If it is found that this can't be done while
+    # maintaining only two colors or having two bipartite sets, then the
+    # graph is not bipartite. Go until all vertices have been colored or
+    # it is found a bipartite graph is not possible.
     # Initialize vertex to check neighbors and index.
-    i = 0
-    v = vertices[0]  # color already initialized to 0
-    # for v in vertices:
-    # while len(colors) != len(graph):
-    while len(q) > 0:
+    i = 0              # initial index
+    v = vertices[0]    # color already initialized to 0
+    while len(q) > 0:  # go until the queue has been emptied
         neighbors = graph[v]  # neighbors of vertex v
         if v in colors and v in q:
             for n in neighbors:  # Color all neighbors the other color.
@@ -252,16 +213,18 @@ def is_bipartite(graph):
                 else:
                     # Does a neighbor have same color?
                     if colors[v] == colors[n]:
-                        # print(colors)
+                        #print(colors)
                         return False
-            q.remove(v)
+            q.remove(v)  # remove vertex v from the queue
 
         # Loop and repeat over all the vertices as needed.
         i = (i + 1) % len(vertices)
         v = vertices[i]
-        # print(q)
+        #print(q)
 
-    # print(colors)
+    #print(colors)
+    # No adjacent vertices were found to have the same color, so the
+    # graph is therefore bipartite.
     return True
 
 
@@ -270,9 +233,9 @@ Boolean Perfect Matching method:
 
 This method determines if a bipartite graph (assumed) has a perfect
 matching. True is returned if the graph has a perfect matching.
-Hall's Theorem is used:
+Hall's Theorem is used. 
 :param graph: a bipartite graph (assumed to be)
-:return: Boolean: True if has a perfect matching
+:return: True if graph has a perfect matching
 """
 
 
@@ -280,24 +243,27 @@ def is_perfect(graph):
     # Get the partite sets of the bipartite graph.
     X, Y = partite_sets(graph)
 
+    # Halls Theorem:
     # Check the size of the neighborhood for each subset of each partite
-    # set. The size of the union of neighborhoods should be less than or
-    # equal to the size of the subset for each subset.
+    # set. The size of the union of neighborhoods should be greater than
+    # or equal to the size of the subset for each subset of the partite
+    # sets.
     # Find all subsets (power set) of each partite set.
     A = power(X)
     B = power(Y)
-    print(X)
-    print(A)
-    print(Y)
-    print(B)
+    # print(X)
+    # print(A)
+    # print(Y)
+    # print(B)
 
-    n = []  # union of neighborhoods of a subset
-    for s in A:  # for all subsets of partite set X
-        for v in s:  # for all vertices in the subset
+    n = []                  # union of neighborhoods of a subset
+    for s in A:             # for all subsets of partite set X
+        for v in s:         # for all vertices in the subset
             tmp = graph[v]  # neighbors of vertex v
-            for t in tmp:
+            for t in tmp:   # for all neighbors of vertex v
+                # if union of neighbors doesn't contain vertex
                 if t not in n:
-                    n.append(t)
+                    n.append(t)  # add to union of neighbors
         # if size of union of neighborhoods is less than size of subset
         if len(n) < len(s):
             return False
@@ -325,8 +291,8 @@ Test all the functions from the project.
 
 if __name__ == "__main__":
     """
-  Test all the functions from the project.
-  """
+    Test all the functions from the project.
+    """
     print('test power(list)')
     print(power([1, 3, 5]))
     print(power([1, 1, 1]))

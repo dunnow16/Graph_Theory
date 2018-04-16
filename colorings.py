@@ -1,5 +1,3 @@
-import copy
-
 """
     Owen Dunn, MTH 325, 4/19/18, Project 2: Colorings
 
