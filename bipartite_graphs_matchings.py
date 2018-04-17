@@ -1,3 +1,8 @@
+
+# coding: utf-8
+
+# In[13]:
+
 import copy
 
 """
@@ -23,7 +28,7 @@ print("Project 1: Bipartite Graphs and Matchings")
     The set is actually a list data type in Python.
 
     :param _list: a list
-    :return: a set
+    :return: a set (list data type)
 """
 
 
@@ -166,6 +171,10 @@ def partite_sets(graph={}):
                     set1.append(v)
                     q.remove(v)
                     break
+            if len(neighbors) == 0:  # has no neighbors
+                # arbitrarily add to the first partite set
+                set1.append(v)  
+                q.remove(v)
 
         # cycle and re-try vertices as needed
         i = (i + 1) % len(vertices)
@@ -188,8 +197,10 @@ def is_bipartite(graph={}):
     q = copy.deepcopy(vertices)    # queue of all vertices
     colors = {vertices[0]: 0}      # 0 or 1 used (2 colors)
 
-    if len(graph) <= 1:
+    if len(graph) == 1:
         return True
+    elif len(graph) == 0:
+        return False
 
     # Using coloring logic, assign colors to vertices. First assign
     # color 1 to the initial vertex. Then iteratively go to the
@@ -203,7 +214,7 @@ def is_bipartite(graph={}):
     v = vertices[0]    # color already initialized to 0
     while len(q) > 0:  # go until the queue has been emptied
         neighbors = graph[v]  # neighbors of vertex v
-        if v in colors and v in q:
+        if v in colors and v in q:             
             for n in neighbors:  # Color all neighbors the other color.
                 if n not in colors:
                     if colors[v] == 0:
@@ -216,6 +227,9 @@ def is_bipartite(graph={}):
                         #print(colors)
                         return False
             q.remove(v)  # remove vertex v from the queue
+        elif len(neighbors) == 0 and v in q:  # an isolated vertex
+            colors[v] = 0
+            q.remove(v)
 
         # Loop and repeat over all the vertices as needed.
         i = (i + 1) % len(vertices)
@@ -233,7 +247,7 @@ Boolean Perfect Matching method:
 
 This method determines if a bipartite graph (assumed) has a perfect
 matching. True is returned if the graph has a perfect matching.
-Hall's Theorem is used. 
+Hall's Theorem for a perfect matching is used. 
 :param graph: a bipartite graph (assumed to be)
 :return: True if graph has a perfect matching
 """
@@ -243,7 +257,7 @@ def is_perfect(graph={}):
     # Get the partite sets of the bipartite graph.
     X, Y = partite_sets(graph)
 
-    # Halls Theorem:
+    # Halls Theorem for perfect matching:
     # Check the size of the neighborhood for each subset of each partite
     # set. The size of the union of neighborhoods should be greater than
     # or equal to the size of the subset for each subset of the partite
@@ -259,6 +273,9 @@ def is_perfect(graph={}):
     if len(graph) == 0:
         print('You must provide a graph.')
         return False
+    # A graph with no edges can't have a perfect matching.
+    elif len(graph) == 1:  
+        return False
 
     n = []                  # union of neighborhoods of a subset
     for s in A:             # for all subsets of partite set X
@@ -273,8 +290,8 @@ def is_perfect(graph={}):
             return False
         n = []  # reset the union of neighborhoods
 
-    for s in B:  # for all subsets of partite set Y
-        for v in s:  # for all vertices in the subset
+    for s in B:             # for all subsets of partite set Y
+        for v in s:         # for all vertices in the subset
             tmp = graph[v]  # neighbors of vertex v
             for t in tmp:
                 if t not in n:
@@ -312,6 +329,12 @@ if __name__ == "__main__":
     print(partite_sets({'A': ['B', 'F'], 'B': ['A', 'C'],
                         'C': ['B', 'D'], 'D': ['C', 'E'],
                         'E': ['D', 'F'], 'F': ['A', 'E']}))
+    print(partite_sets({'A': ['D', 'E'], 'B': ['D', 'E'], 
+                        'C': ['D', 'E'], 'F': ['D', 'E'],
+                        'D': ['A', 'B', 'C', 'F'],
+                        'E': ['A', 'B', 'C', 'F']}))
+    print(partite_sets({'A': ['B'], 'B': ['A']})) 
+    print(partite_sets({'A': [], 'B': []}))  # no edges case
     print()
 
     print('test is_bipartite(graph)')
@@ -323,6 +346,12 @@ if __name__ == "__main__":
     print(is_bipartite({'A': ['B', 'F'], 'B': ['A', 'C'],
                         'C': ['B', 'D'], 'D': ['C', 'E'],
                         'E': ['D', 'F'], 'F': ['A', 'E']}))  # T
+    print(is_bipartite({'A': ['D', 'E'], 'B': ['D', 'E'], 
+                        'C': ['D', 'E'], 'F': ['D', 'E'],
+                        'D': ['A', 'B', 'C', 'F'],
+                        'E': ['A', 'B', 'C', 'F']}))  # T
+    print(is_bipartite({'A': ['B'], 'B': ['A']}))  # T
+    print(is_bipartite({'A': [], 'B': []}))  # no edges case = T
     print()
 
     print('test is_perfect(graph)')
@@ -335,4 +364,9 @@ if __name__ == "__main__":
     print(is_perfect({'A': ['E', 'F'], 'B': ['D', 'E'], 'C': ['D', 'F'],
                       'D': ['B', 'C'], 'E': ['A', 'B'],
                       'F': ['A', 'C']}))  # T
+    print(is_perfect({'A': ['D', 'E'], 'B': ['D', 'E'], 
+                      'C': ['D', 'E'], 'F': ['D', 'E'],
+                      'D': ['A', 'B', 'C', 'F'],
+                      'E': ['A', 'B', 'C', 'F']}))  # F
+    print(is_perfect({'A': ['B'], 'B': ['A']}))  # T
     print()

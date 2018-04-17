@@ -34,7 +34,7 @@ def is_proper(graph={}, color={}):
     for v in vertices:  # for all vertices in the graph
         v_color = color[v]    # the vertex's color
         neighbors = graph[v]  # the neighbors of the vertex
-        # Check if any of the vertex neighbors have the same color.
+        # Check if any of the vertex's neighbors have the same color.
         for n in neighbors:
             if v_color == color[n]:
                 return False
@@ -158,8 +158,9 @@ def is_proper_edge(graph={}):
     if len(graph) == 0:
         print('You must provide a weighted graph.')
         return
-    if len(graph) == 1:
-        return True  # a single edge with a color is proper
+    elif len(graph) <= 2:
+        # no edges is proper?
+        return True  # a single edge with a color is proper 
 
     for i in range(len(vertices)):  # Go for each vertex.
         v = vertices[i]    # a vertex to consider its edges
@@ -232,7 +233,7 @@ def greedy(graph={}, order={}):
                     colored = True
                 c = c + 1  # try the next color
 
-    # Return the completed proper vertex coloring sorted by letter.
+    # Return the completed proper vertex coloring dictionary sorted by letter.
     return dict(sorted(color.items()))
 
 
@@ -247,16 +248,25 @@ if __name__ == "__main__":
     print(is_proper({'A': ['B', 'C'], 'B': ['A', 'C'],
                      'C': ['A', 'B']},
                     {'A': 1, 'B': 1, 'C': 3}))  # F
+    print(is_proper({'A': ['B', 'C', 'D'], 'B': ['A', 'D'],
+                     'C': ['A', 'D'], 'D': ['A', 'B', 'C']},
+                    {'A': 1, 'B': 1, 'C': 3, 'D': 2}))  # F 
+    print(is_proper({'A': ['B', 'C', 'D'], 'B': ['A', 'D'],
+                     'C': ['A', 'D'], 'D': ['A', 'B', 'C']},
+                    {'A': 2, 'B': 1, 'C': 1, 'D': 3}))  # T
     print()
     print('test three_color(graph)')
     print(three_color({'A': ['B'], 'B': ['A']}))
+    print(three_color({'A': ['B'], 'B': ['A', 'C'], 
+                       'C': ['A', 'D'], 'D': ['C']}))
     print()
     print('test is_three_color(graph)')
     print(is_three_color({'A': ['B', 'C'], 'B': ['A', 'C'],
                           'C': ['A', 'B']}))  # T
     print(is_three_color({'A': ['B', 'C', 'D'], 'B': ['A', 'C', 'D'],
-                          'C': ['A', 'B', 'D'], 'D': ['A', 'B', 'C']}))
-    # F
+                          'C': ['A', 'B', 'D'], 'D': ['A', 'B', 'C']}))  # F
+    print(is_three_color({'A': ['B', 'C', 'D'], 'B': ['A', 'D'],
+                          'C': ['A', 'D'], 'D': ['A', 'B', 'C']}))  # T
     print()
     print('test is_proper_edge(graph)')
     print(is_proper_edge({'A': [['B', 1], ['C', 2]],
