@@ -1,1 +1,2 @@
-# Graph_Theory
+# Graph Theory
+Bipartite graphs and colorings solutions in Python.
